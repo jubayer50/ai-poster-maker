@@ -1,12 +1,13 @@
 "use client";
 
 import { Separator } from "@heroui/react";
+import Image from "next/image";
 
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
-import { GoEyeClosed } from "react-icons/go";
+import { GoEyeClosed, GoUpload } from "react-icons/go";
 
 type SignUpFormData = {
   name: string;
@@ -17,6 +18,14 @@ type SignUpFormData = {
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState("");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    const previewUrl = URL.createObjectURL(file);
+    setImageUrl(previewUrl);
+  };
 
   const {
     register,
@@ -54,6 +63,37 @@ const SignUpPage = () => {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* upload image section */}
+            <div>
+              <div className="flex justify-center flex-1">
+                <label
+                  htmlFor="image"
+                  className="w-17 h-17 flex items-center justify-center overflow-hidden rounded-full border border-green-500"
+                >
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      width={500}
+                      height={500}
+                      alt="profile picture"
+                      className="w-full h-full object-cover"
+                    ></Image>
+                  ) : (
+                    <GoUpload className="w-6 h-6 text-white" />
+                  )}
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    name="image"
+                    id="image"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
             {/* Name */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-200">
