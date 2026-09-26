@@ -4,12 +4,32 @@ import { useState } from "react";
 import { Button } from "@heroui/react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { usePathname } from "next/navigation";
+import MyNavLink from "./MyNavLink";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
+
+  const pathName = usePathname();
+
+  const navLinks = (
+    <>
+      <MyNavLink href="/" pathName={pathName}>
+        Home
+      </MyNavLink>
+
+      <MyNavLink href="/my-poster" pathName={pathName}>
+        My poster
+      </MyNavLink>
+
+      <MyNavLink href="/create-poster" pathName={pathName}>
+        Create poster
+      </MyNavLink>
+    </>
+  );
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-white/10 bg-slate-950/80 shadow-lg shadow-black/5 backdrop-blur-xl">
@@ -56,24 +76,8 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <ul className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-1 py-2 shadow-inner shadow-white/5 md:flex">
-          <li>
-            <Link
-              href="#"
-              className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
-            >
-              My poster
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="#"
-              className="rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:bg-emerald-500/15 hover:text-emerald-300"
-            >
-              Create poster
-            </Link>
-          </li>
+        <ul className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 p-2 shadow-inner shadow-white/5 md:flex">
+          {navLinks}
         </ul>
 
         {/* Login */}
@@ -115,25 +119,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="border-t border-white/10 bg-slate-950/95 backdrop-blur-xl md:hidden">
-          <ul className="flex flex-col gap-2 p-4">
-            <li>
-              <Link
-                href="#"
-                className="block rounded-lg px-4 py-3 font-medium text-slate-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
-              >
-                My poster
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="#"
-                className="block rounded-lg bg-emerald-500/10 px-4 py-3 font-medium text-emerald-400 transition-all duration-300 hover:bg-emerald-500/20"
-              >
-                Create poster
-              </Link>
-            </li>
-          </ul>
+          <ul className="flex flex-col gap-2 p-4">{navLinks}</ul>
         </div>
       )}
     </nav>
