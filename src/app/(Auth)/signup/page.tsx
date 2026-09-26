@@ -1,10 +1,12 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { uploadImage } from "@/lib/UploadImage/uploadImage";
 import { Separator } from "@heroui/react";
 import Image from "next/image";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
@@ -20,6 +22,8 @@ type SignUpFormData = {
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
+
+  const router = useRouter();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,7 +50,25 @@ const SignUpPage = () => {
       ...data,
       image: imageHostUrl,
     };
-    console.log(newSignupData, "new signup data");
+
+    const { data: authData, error } = await authClient.signUp.email({
+      ...newSignupData,
+
+      // email,
+      // password,
+      // name,
+      // image,
+    });
+
+    if (authData?.token) {
+      router.push("/");
+    }
+
+    if (error) {
+      console.log(error?.message);
+    }
+
+    setImageUrl("");
 
     reset();
   };

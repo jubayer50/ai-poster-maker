@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { Button } from "@heroui/react";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-white/10 bg-slate-950/80 shadow-lg shadow-black/5 backdrop-blur-xl">
@@ -74,12 +78,37 @@ const Navbar = () => {
 
         {/* Login */}
         <div>
-          <Button
-            size="sm"
-            className="border border-emerald-400/30 bg-linear-to-r from-emerald-500 to-green-500 px-5 font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/30"
-          >
-            Login
-          </Button>
+          {user ? (
+            <div>
+              <Button
+                size="sm"
+                className="border border-emerald-400/30 bg-linear-to-r from-emerald-500 to-green-500 px-3 font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/30"
+                onClick={async () => await authClient.signOut()}
+              >
+                Signout
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href={"/signup"}>
+                <Button
+                  size="sm"
+                  className="border border-emerald-400/30 bg-linear-to-r from-emerald-500 to-green-500 px-3 font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/30"
+                >
+                  Signup
+                </Button>
+              </Link>
+
+              <Link href={"/signin"}>
+                <Button
+                  size="sm"
+                  className="border border-green-500 bg-transparent px-3 font-semibold text-white shadow transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/30"
+                >
+                  Signin
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 

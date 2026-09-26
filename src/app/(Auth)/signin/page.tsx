@@ -1,7 +1,9 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { Button, Separator } from "@heroui/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
@@ -15,6 +17,8 @@ type SigninFormData = {
 const SigninPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -22,8 +26,18 @@ const SigninPage = () => {
     formState: { errors },
   } = useForm<SigninFormData>();
 
-  const onSubmit = (data: SigninFormData) => {
-    console.log(data);
+  const onSubmit = async (data: SigninFormData) => {
+    const { data: authData, error } = await authClient.signIn.email({
+      ...data,
+    });
+
+    if (authData?.token) {
+      router.push("/");
+    }
+
+    if (error) {
+      console.log(error?.message);
+    }
 
     reset();
   };
