@@ -1,10 +1,11 @@
 "use client";
 
+import { uploadImage } from "@/lib/UploadImage/uploadImage";
 import { Separator } from "@heroui/react";
 import Image from "next/image";
 
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { GoEyeClosed, GoUpload } from "react-icons/go";
@@ -12,7 +13,7 @@ import { GoEyeClosed, GoUpload } from "react-icons/go";
 type SignUpFormData = {
   name: string;
   email: string;
-  image: string;
+  image: FileList | null;
   password: string;
 };
 
@@ -20,8 +21,10 @@ const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
 
     const previewUrl = URL.createObjectURL(file);
     setImageUrl(previewUrl);
@@ -34,8 +37,17 @@ const SignUpPage = () => {
     formState: { errors },
   } = useForm<SignUpFormData>();
 
-  const onSubmit = (data: SignUpFormData) => {
-    console.log(data, "from signup page");
+  const onSubmit = async (data: SignUpFormData) => {
+    if (!data.image) return;
+
+    const imageHostUrl = await uploadImage(data.image[0]);
+
+    const newSignupData = {
+      ...data,
+      image: imageHostUrl,
+    };
+    console.log(newSignupData, "new signup data");
+
     reset();
   };
 
@@ -85,10 +97,9 @@ const SignUpPage = () => {
                   <input
                     type="file"
                     accept="image/*"
-                    name="image"
                     id="image"
-                    onChange={handleImageChange}
                     className="hidden"
+                    {...register("image", { onChange: handleImageChange })}
                   />
                 </label>
               </div>
@@ -136,20 +147,6 @@ const SignUpPage = () => {
                   {errors.email.message}
                 </p>
               )}
-            </div>
-
-            {/* Image URL */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-200">
-                Image URL
-              </label>
-
-              <input
-                type="text"
-                placeholder="Enter your Image URL"
-                {...register("image")}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-all duration-300 placeholder:text-slate-500 focus:border-emerald-400/60 focus:bg-white/10 focus:ring-2 focus:ring-emerald-400/10"
-              />
             </div>
 
             {/* Password */}
